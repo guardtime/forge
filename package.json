@@ -51,7 +51,7 @@
     "email": "support@digitalbazaar.com"
   },
   "license": "(BSD-3-Clause OR GPL-2.0)",
-  "main": "lib/index.js",
+  "main": "dist/forge.gt.js",
   "files": [
     "lib/*.js",
     "flash/swf/*.swf",
