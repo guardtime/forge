@@ -34,9 +34,7 @@ const outputs = [
   // Guardtime JS common
   {
     entry: ['./lib/sha256.js', './lib/x509.js', './lib/hmac.js', './lib/forge.js'],
-    filenameBase: 'forge.gt',
-    library: null,
-    libraryTarget: null
+    filenameBase: 'forge.gt'
   }
   // Custom builds can be created by specifying the high level files you need
   // webpack will pull in dependencies as needed.
