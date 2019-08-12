@@ -1,35 +1,49 @@
 var forge = require('..');
-
+var fs = require('fs');
 try {
   // create PKCS#7 signed data
-  var p7 = forge.pkcs7.createSignedData();
-  p7.content = forge.util.createBuffer('Some content to be signed.', 'utf8');
-  var signers = ['a', 'b'];
-  for(var i = 0; i < signers.length; ++i) {
-    var signer = createSigner(signers[i]);
-    p7.addCertificate(signer.certificate);
-    p7.addSigner({
-      key: signer.keys.privateKey,
-      certificate: signer.certificate,
-      digestAlgorithm: forge.pki.oids.sha256,
-      authenticatedAttributes: [{
-        type: forge.pki.oids.contentType,
-        value: forge.pki.oids.data
-      }, {
-        type: forge.pki.oids.messageDigest
-        // value will be auto-populated at signing time
-      }, {
-        type: forge.pki.oids.signingTime,
-        // value will be auto-populated at signing time
-        //value: new Date('2050-01-01T00:00:00Z')
-      }]
-    });
+  // var p7 = forge.pkcs7.createSignedData();
+  // p7.content = forge.util.createBuffer('Some content to be signed.', 'utf8');
+  // var signers = ['a', 'b'];
+  // for(var i = 0; i < signers.length; ++i) {
+  //   var signer = createSigner(signers[i]);
+  //   p7.addCertificate(signer.certificate);
+  //   p7.addSigner({
+  //     key: signer.keys.privateKey,
+  //     certificate: signer.certificate,
+  //     digestAlgorithm: forge.pki.oids.sha256,
+  //     authenticatedAttributes: [{
+  //       type: forge.pki.oids.contentType,
+  //       value: forge.pki.oids.data
+  //     }, {
+  //       type: forge.pki.oids.messageDigest
+  //       // value will be auto-populated at signing time
+  //     }, {
+  //       type: forge.pki.oids.signingTime,
+  //       // value will be auto-populated at signing time
+  //       //value: new Date('2050-01-01T00:00:00Z')
+  //     }]
+  //   });
+  // }
+  //
+  // p7.sign();
+  // // console.log("Signed msg: ");
+  // // console.log(p7);
+  // // var pem = forge.pkcs7.messageToPem(p7);
+  // // console.log('Signed PKCS #7 message:\n' + pem);
+  // console.log(p7.verify());
+
+
+
+  try {
+    var pem = fs.readFileSync('signed.p7', 'utf8')
+  } catch (err) {
+    console.error(err)
   }
 
-  p7.sign();
-
-  var pem = forge.pkcs7.messageToPem(p7);
-  console.log('Signed PKCS #7 message:\n' + pem);
+  var importedSignature = forge.pkcs7.messageFromPem(pem);
+  console.log(importedSignature);
+  console.log(importedSignature.verify());
 } catch(ex) {
   if(ex.stack) {
     console.log(ex.stack);
@@ -42,11 +56,11 @@ function createSigner(name) {
   console.log('Creating signer "' + name + '"...');
 
   // generate a keypair
-  console.log('Generating 1024-bit key-pair...');
-  var keys = forge.pki.rsa.generateKeyPair(1024);
-  console.log('Key-pair created:');
-  console.log(forge.pki.privateKeyToPem(keys.privateKey));
-  console.log(forge.pki.publicKeyToPem(keys.publicKey));
+  // console.log('Generating 1024-bit key-pair...');
+  var keys = forge.pki.rsa.generateKeyPair(1024, 0x10001);
+  // console.log('Key-pair created:');
+  // console.log(forge.pki.privateKeyToPem(keys.privateKey));
+  // console.log(forge.pki.publicKeyToPem(keys.publicKey));
 
   // create a certificate
   var certificate = createCertificate(name, keys);
@@ -109,7 +123,7 @@ function createCertificate(name, keys) {
 
   // self-sign certificate
   cert.sign(keys.privateKey);
-  console.log('Certificate created: \n' + forge.pki.certificateToPem(cert));
+  // console.log('Certificate created: \n' + forge.pki.certificateToPem(cert));
 
   return cert;
 }
